@@ -4,9 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -18,7 +15,10 @@ public class MainActivity extends AppCompatActivity {
     String oldNumber;
     String oldOperation = "";
     String operator;
+    String text;
+    String inputText;
     boolean ishaveOutput = false;
+    boolean isdeleted = false;
     TextView input;
     TextView output;
 
@@ -32,9 +32,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void numberEvent(View view) throws ParseException {
-        int minplus;
+        double minplus;
 
-        switch (view.getId()){
+        if (isdeleted) {
+            newNumber = "";
+            isdeleted = false;
+        }
+
+        switch (view.getId()) {
             case R.id.button0:
                 newNumber += "0";
                 break;
@@ -69,53 +74,77 @@ public class MainActivity extends AppCompatActivity {
                 newNumber += ".";
                 break;
             case R.id.resetButton:
-                oldOperation= "";
+                oldOperation = "";
                 newNumber = "";
                 ishaveOutput = false;
                 output.setText("");
                 break;
             case R.id.minus_or_plus_Button:
-                minplus = NumberFormat.getInstance().parse(newNumber).intValue() * -1;
+                minplus = NumberFormat.getInstance().parse(newNumber).doubleValue() * -1;
                 newNumber = String.valueOf(minplus);
-                break;
-            case R.id.deleteButton:
-                String newtext = input.getText().toString().substring(0,input.length()-1);
-                input.setText(newtext);
                 break;
         }
 
-        input.setText(oldOperation + newNumber);
+        inputText = oldOperation + newNumber;
+        input.setText(inputText);
 
-        if(oldOperation != "" && newNumber != "") {
+        if (oldOperation != "" && newNumber != "") {
             output.setText(operate());
         }
     }
 
     public void operatorEvent(View view) {
-        oldNumber = input.getText().toString();
+        int number;
         newNumber = "";
+        String stringvalue;
 
-        if(ishaveOutput){
+        if (isdeleted) {
+            stringvalue = String.valueOf(input.getText().toString());
+            if (stringvalue != "/" || stringvalue != "*"
+                    || stringvalue != "%" || stringvalue != "+"
+                    || stringvalue != "-" ) {
+                oldNumber = input.getText().toString();
+                operator ="";
+                oldOperation = "";
+            } else if (input.getText().toString().substring(0,
+                    input.getText().toString().length() - 1) == operator) {
+                number = Integer.valueOf(input.getText().toString());
+                oldNumber = String.valueOf(number);
+            }
+            isdeleted = false;
+        } else {
+            oldNumber = input.getText().toString();
+        }
+
+        if (ishaveOutput) {
             oldNumber = output.getText().toString();
             output.setText("");
             ishaveOutput = false;
         }
 
-        switch (view.getId()){
+        if (operator != "") {
+            operator = "";
+        }
+
+        switch (view.getId()) {
             case R.id.divideButton:
-                operator = " / ";
+                operator = "/";
                 break;
-            case R.id.multiplyButton:Button:
-                operator = " x ";
+            case R.id.multiplyButton:
+                Button:
+                operator = "x";
                 break;
-            case R.id.modulusButton:Button:
-                operator = " % ";
+            case R.id.modulusButton:
+                Button:
+                operator = "%";
                 break;
-            case R.id.plusButton:Button:
-                operator = " + ";
+            case R.id.plusButton:
+                Button:
+                operator = "+";
                 break;
-            case R.id.minusButton:Button:
-                operator = " - ";
+            case R.id.minusButton:
+                Button:
+                operator = "-";
                 break;
         }
 
@@ -131,30 +160,64 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_history);
     }
 
-    public String operate(){
+    public String operate() {
         double result = 0.0;
         DecimalFormat df = new DecimalFormat("#.##");
 
-        switch (operator){
-            case " + " :
+        switch (operator) {
+            case "+":
                 result = Double.parseDouble(oldNumber) + Double.parseDouble(newNumber);
                 break;
-            case " - " :
+            case "-":
                 result = Double.parseDouble(oldNumber) - Double.parseDouble(newNumber);
                 break;
-            case " x " :
+            case "x":
                 result = Double.parseDouble(oldNumber) * Double.parseDouble(newNumber);
                 break;
-            case " / " :
+            case "/":
                 result = Double.parseDouble(oldNumber) / Double.parseDouble(newNumber);
                 break;
-            case " % " :
+            case "%":
                 result = Double.parseDouble(oldNumber) / 100 * Double.parseDouble(newNumber);
                 break;
         }
 
         ishaveOutput = true;
         return df.format(result);
+    }
+
+    public void backEvent(View view) {
+        setContentView(R.layout.activity_main);
+
+        input = (TextView) findViewById(R.id.inputText);
+        output = (TextView) findViewById(R.id.resultsText);
+
+        oldOperation = "";
+        newNumber = "";
+        ishaveOutput = false;
+        output.setText("");
+    }
+
+    public void deleteEvent(View view) {
+        int numbervalue;
+        text = input.getText().toString();
+        if (text != "") {
+            text = text.substring(0, text.length() - 1);
+            input.setText(text);
+            if(input.getText().toString().substring(0,
+                    input.getText().toString().length() - 1) == oldNumber){
+                numbervalue = Integer.valueOf(text);
+                oldNumber = String.valueOf(numbervalue);
+            }
+        }else{
+            input.setText("");
+            oldOperation = "";
+        }
+
+        newNumber = "";
+        ishaveOutput = false;
+        output.setText("");
+        isdeleted = true;
     }
 
 }

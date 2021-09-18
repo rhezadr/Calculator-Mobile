@@ -30,7 +30,8 @@
             android:layout_alignParentRight="true"
             android:background="@color/Transparent"
             android:src="@drawable/icon_history"
-            app:tint="@color/orange" />
+            app:tint="@color/orange"
+            android:onClick="historyEvent"/>
 
     </RelativeLayout>
 
@@ -117,7 +118,7 @@
                 android:backgroundTint="@color/light_yellow"
                 android:src="@drawable/icon_backspace_30"
                 app:tint="@color/black"
-                android:onClick="numberEvent"/>
+                android:onClick="deleteEvent"/>
 
         </LinearLayout>
 
